@@ -1,5 +1,6 @@
 const axios = require('axios')
 const Dev = require('../models/dev')
+const { findConnections, sendMessage } = require('../services/websocket')
 
 module.exports = {
 
@@ -26,7 +27,7 @@ module.exports = {
 
       const techsArray = techs.split(',').map(tech => tech.trim())
 
-      let dev = await Dev.create({
+      dev = await Dev.create({
         github_username,
         name,
         avatar_url,
@@ -38,6 +39,12 @@ module.exports = {
         }
 
       })
+
+      const sendSocketMessageTo = findConnections(
+        { latitude, longitude },
+        techsArray,
+      )
+      sendMessage(sendSocketMessageTo, 'new-dev', dev)
 
     }
 
